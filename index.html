@@ -11,9 +11,7 @@ margin:0;
 overflow:hidden;
 font-family:Georgia,serif;
 color:white;
-text-align:center;
 background:black;
-transition:background 2s;
 }
 
 canvas{
@@ -23,138 +21,97 @@ left:0;
 z-index:-1;
 }
 
-/* TITULO */
+/* ESCENAS */
 
-h1{
-margin-top:40px;
-font-size:42px;
-letter-spacing:2px;
+.escena{
+
+position:absolute;
+width:100%;
+height:100%;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:center;
+
+align-items:center;
+
+opacity:0;
+
+transition:opacity 1.5s;
+
+}
+
+.activa{
+opacity:1;
+}
+
+/* BOTONES */
+
+.menu{
+
+position:fixed;
+bottom:40px;
+width:100%;
+display:flex;
+justify-content:center;
+gap:40px;
+
+}
+
+button{
+
+padding:12px 20px;
+font-size:18px;
+cursor:pointer;
+
 }
 
 /* CONTADOR */
 
 .contadorBox{
 
-margin-top:20px;
-
-display:inline-block;
-
 border:6px solid black;
+padding:30px 70px;
+background:rgba(0,0,0,0.7);
 
-padding:30px 60px;
-
-background:rgba(0,0,0,0.6);
-
-}
-
-.contadorTitulo{
-color:red;
-font-size:22px;
 }
 
 .contador{
+
 font-size:70px;
-color:#ff2b2b;
-letter-spacing:6px;
+color:red;
+
 }
 
 /* CARTA */
 
 .carta{
 
-display:none;
-
-width:60%;
-
-margin:auto;
-
-margin-top:50px;
-
 background:white;
-
 color:black;
 
 padding:60px;
 
 border-radius:10px;
 
-box-shadow:0 25px 80px rgba(0,0,0,0.7);
+width:60%;
 
 font-size:22px;
 
 line-height:1.8;
 
-animation:aparecerCarta 2s;
+box-shadow:0 20px 60px rgba(0,0,0,0.7);
 
-}
-
-@keyframes aparecerCarta{
-
-from{
-opacity:0;
-transform:translateY(60px);
-}
-
-to{
-opacity:1;
-transform:translateY(0);
-}
-
-}
-
-/* PREGUNTA */
-
-.pregunta{
-
-display:none;
-
-margin-top:40px;
-
-}
-
-input{
-padding:12px;
-font-size:18px;
-}
-
-button{
-padding:12px 20px;
-font-size:18px;
-cursor:pointer;
 }
 
 /* FINAL */
 
 #final{
 
-display:none;
-
-position:fixed;
-
-top:50%;
-left:50%;
-
-transform:translate(-50%,-50%);
-
-font-size:100px;
-
-text-shadow:0 0 60px white;
-
-animation:zoomFinal 3s;
-
-}
-
-@keyframes zoomFinal{
-
-from{
-opacity:0;
-transform:scale(0.4) translate(-50%,-50%);
-}
-
-to{
-opacity:1;
-transform:scale(1) translate(-50%,-50%);
-}
+font-size:120px;
+text-shadow:0 0 80px white;
 
 }
 
@@ -165,27 +122,47 @@ transform:scale(1) translate(-50%,-50%);
 
 <canvas id="canvas"></canvas>
 
+<!-- ESCENA 1 -->
+
+<div class="escena activa" id="escena1">
+
 <h1>Emily…</h1>
 
-<p style="font-size:24px;">
-mi corazón todavía recuerda tu nombre.
+<p style="font-size:26px;">
+mi corazón todavía recuerda tu nombre
 </p>
+
+</div>
+
+<!-- ESCENA 2 -->
+
+<div class="escena" id="escena2">
 
 <div class="contadorBox">
 
-<div class="contadorTitulo">
-DIAS : HORAS : MINUTOS
-</div>
+<p>DIAS : HORAS : MINUTOS</p>
 
 <div class="contador" id="contador"></div>
 
 </div>
 
-<div class="carta" id="carta">
-<p id="textoCarta"></p>
 </div>
 
-<div class="pregunta" id="pregunta">
+<!-- ESCENA 3 -->
+
+<div class="escena" id="escena3">
+
+<div class="carta">
+
+<p id="textoCarta"></p>
+
+</div>
+
+</div>
+
+<!-- ESCENA 4 -->
+
+<div class="escena" id="escena4">
 
 <h2>¿Cuándo terminó todo?</h2>
 
@@ -195,11 +172,127 @@ DIAS : HORAS : MINUTOS
 
 </div>
 
+<!-- ESCENA 5 -->
+
+<div class="escena" id="escena5">
+
 <div id="final">TE EXTRAÑO</div>
+
+</div>
+
+<!-- MENU -->
+
+<div class="menu">
+
+<button onclick="anterior()">⬅</button>
+
+<button onclick="siguiente()">➡</button>
+
+</div>
 
 <script>
 
-/* CANVAS */
+/* ESCENAS */
+
+let escenaActual=1
+
+function mostrarEscena(n){
+
+document.querySelectorAll(".escena").forEach(e=>{
+
+e.classList.remove("activa")
+
+})
+
+document.getElementById("escena"+n).classList.add("activa")
+
+}
+
+function siguiente(){
+
+if(escenaActual<5){
+
+escenaActual++
+
+mostrarEscena(escenaActual)
+
+}
+
+}
+
+function anterior(){
+
+if(escenaActual>1){
+
+escenaActual--
+
+mostrarEscena(escenaActual)
+
+}
+
+}
+
+/* CONTADOR DESDE 3 MARZO 2026 */
+
+let inicio=new Date("March 3 2026 00:00:00").getTime()
+
+setInterval(()=>{
+
+let ahora=new Date().getTime()
+
+let d=ahora-inicio
+
+let dias=Math.floor(d/(1000*60*60*24))
+
+let horas=Math.floor((d%(1000*60*60*24))/(1000*60*60))
+
+let minutos=Math.floor((d%(1000*60*60))/(1000*60))
+
+document.getElementById("contador").innerHTML=
+
+dias+" : "+horas+" : "+minutos
+
+},1000)
+
+/* CARTA ESCRIBIENDOSE */
+
+let texto="A veces intento distraerme… pero siempre termino pensando en ti. No es algo dramático. Solo hay momentos en los que mi corazón vuelve a pronunciar tu nombre. Emily… te extraño."
+
+let i=0
+
+function escribir(){
+
+if(i<texto.length){
+
+document.getElementById("textoCarta").innerHTML+=texto.charAt(i)
+
+i++
+
+setTimeout(escribir,40)
+
+}
+
+}
+
+setTimeout(escribir,2000)
+
+/* RESPUESTA */
+
+function verificar(){
+
+let r=document.getElementById("respuesta").value.toLowerCase()
+
+if(r.includes("3") && r.includes("mar")){
+
+escenaActual=5
+
+mostrarEscena(5)
+
+}
+
+}
+
+/* ESTRELLAS */
 
 let canvas=document.getElementById("canvas")
 let ctx=canvas.getContext("2d")
@@ -207,31 +300,20 @@ let ctx=canvas.getContext("2d")
 canvas.width=window.innerWidth
 canvas.height=window.innerHeight
 
-/* ESTRELLAS CON PROFUNDIDAD */
-
 let estrellas=[]
 
-for(let i=0;i<600;i++){
+for(let i=0;i<400;i++){
 
 estrellas.push({
 
 x:Math.random()*canvas.width,
-
 y:Math.random()*canvas.height,
-
 size:Math.random()*2,
-
-speed:Math.random()*0.7,
-
-targetX:null,
-
-targetY:null
+speed:Math.random()*0.5
 
 })
 
 }
-
-/* ANIMACION */
 
 function animar(){
 
@@ -241,21 +323,12 @@ ctx.fillStyle="white"
 
 estrellas.forEach(e=>{
 
-if(e.targetX!=null){
-
-e.x+=(e.targetX-e.x)*0.02
-e.y+=(e.targetY-e.y)*0.02
-
-}else{
-
 e.y+=e.speed
 
 if(e.y>canvas.height){
 
 e.y=0
 e.x=Math.random()*canvas.width
-
-}
 
 }
 
@@ -270,205 +343,6 @@ requestAnimationFrame(animar)
 }
 
 animar()
-
-/* FORMAR EMILY CON ESTRELLAS */
-
-function formarEmily(){
-
-let textCanvas=document.createElement("canvas")
-
-let tctx=textCanvas.getContext("2d")
-
-textCanvas.width=canvas.width
-textCanvas.height=canvas.height
-
-tctx.font="bold 160px Arial"
-tctx.fillText("EMILY",canvas.width/2-230,canvas.height/2)
-
-let data=tctx.getImageData(0,0,canvas.width,canvas.height)
-
-let puntos=[]
-
-for(let y=0;y<data.height;y+=6){
-for(let x=0;x<data.width;x+=6){
-
-let i=(y*data.width+x)*4
-
-if(data.data[i+3]>128){
-
-puntos.push({x,y})
-
-}
-
-}
-}
-
-/* MOVER ESTRELLAS */
-
-estrellas.forEach((e,i)=>{
-
-if(puntos[i]){
-
-e.targetX=puntos[i].x
-e.targetY=puntos[i].y
-
-}
-
-})
-
-}
-
-setTimeout(formarEmily,4000)
-
-/* DISPERSAR ESTRELLAS */
-
-function dispersar(){
-
-estrellas.forEach(e=>{
-
-e.targetX=null
-e.targetY=null
-
-})
-
-}
-
-setTimeout(dispersar,11000)
-
-/* ESTRELLAS FUGACES */
-
-function estrellaFugaz(){
-
-let x=-200
-let y=Math.random()*200
-
-let interval=setInterval(()=>{
-
-ctx.strokeStyle="white"
-ctx.lineWidth=3
-
-ctx.beginPath()
-ctx.moveTo(x,y)
-ctx.lineTo(x+180,y+90)
-ctx.stroke()
-
-x+=30
-y+=15
-
-if(x>canvas.width){
-
-clearInterval(interval)
-
-}
-
-},20)
-
-}
-
-setInterval(estrellaFugaz,9000)
-
-/* CONTADOR */
-
-let inicio=new Date("March 3 2024 00:00:00").getTime()
-
-setInterval(()=>{
-
-let ahora=new Date().getTime()
-
-let d=ahora-inicio
-
-let dias=Math.floor(d/(1000*60*60*24))
-let horas=Math.floor((d%(1000*60*60*24))/(1000*60*60))
-let minutos=Math.floor((d%(1000*60*60))/(1000*60))
-
-document.getElementById("contador").innerHTML=
-dias+" : "+horas+" : "+minutos
-
-},1000)
-
-/* CARTA */
-
-let texto="A veces intento distraerme… pero siempre termino pensando en ti. No es algo dramático. Solo hay momentos en los que mi corazón vuelve a pronunciar tu nombre. Emily… te extraño."
-
-let i=0
-
-function escribir(){
-
-if(i<texto.length){
-
-document.getElementById("textoCarta").innerHTML+=texto.charAt(i)
-
-i++
-
-setTimeout(escribir,35)
-
-}
-
-}
-
-setTimeout(()=>{
-
-document.body.style.background="linear-gradient(#020111,#191970)"
-
-document.getElementById("carta").style.display="block"
-
-escribir()
-
-},13000)
-
-setTimeout(()=>{
-
-document.getElementById("pregunta").style.display="block"
-
-},20000)
-
-/* RESPUESTA */
-
-function verificar(){
-
-let r=document.getElementById("respuesta").value.toLowerCase()
-
-if(r.includes("3") && r.includes("mar")){
-
-final()
-
-}
-
-}
-
-/* FINAL CINEMATICO */
-
-function final(){
-
-document.body.style.background="black"
-
-let x=-200
-let y=100
-
-let interval=setInterval(()=>{
-
-ctx.strokeStyle="white"
-ctx.lineWidth=4
-
-ctx.beginPath()
-ctx.moveTo(x,y)
-ctx.lineTo(x+200,y+100)
-ctx.stroke()
-
-x+=40
-y+=20
-
-if(x>canvas.width){
-
-clearInterval(interval)
-
-document.getElementById("final").style.display="block"
-
-}
-
-},20)
-
-}
 
 </script>
 
