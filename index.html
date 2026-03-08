@@ -2,17 +2,19 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Para Emily</title>
+<title>Una carta</title>
 
 <style>
 
 body{
 margin:0;
-font-family: 'Georgia', serif;
-overflow:hidden;
 background:black;
 color:white;
+font-family:Georgia,serif;
+overflow:hidden;
 }
+
+/* ESCENAS */
 
 .scene{
 position:absolute;
@@ -24,7 +26,7 @@ align-items:center;
 flex-direction:column;
 opacity:0;
 pointer-events:none;
-transition:opacity 1.5s;
+transition:opacity 2s;
 }
 
 .scene.active{
@@ -32,12 +34,14 @@ opacity:1;
 pointer-events:auto;
 }
 
+/* BOTONES */
+
 button{
-padding:12px 25px;
+padding:12px 28px;
 font-size:18px;
-background:#111;
-color:white;
 border:1px solid white;
+background:transparent;
+color:white;
 cursor:pointer;
 margin-top:20px;
 }
@@ -47,86 +51,91 @@ background:white;
 color:black;
 }
 
-.arrow{
-position:absolute;
-top:50%;
-font-size:30px;
-cursor:pointer;
-user-select:none;
-}
-
-.left{left:20px}
-.right{right:20px}
+/* CANVAS */
 
 canvas{
 position:absolute;
 top:0;
 left:0;
-z-index:-1;
 }
 
-/* contador */
+/* TITULOS */
+
+.title{
+font-size:45px;
+letter-spacing:3px;
+}
+
+/* CONTADOR */
 
 .counterBox{
-border:3px solid black;
 background:white;
-padding:40px;
 color:red;
+padding:40px;
+border:4px solid black;
 font-size:40px;
 text-align:center;
-box-shadow:0 0 20px rgba(0,0,0,0.5);
+box-shadow:0 0 30px rgba(0,0,0,.6);
 }
 
-/* carta */
+/* SOBRE */
+
+.envelope{
+width:300px;
+height:200px;
+background:#eee;
+position:relative;
+cursor:pointer;
+}
+
+.envelope:before{
+content:"";
+position:absolute;
+width:0;
+height:0;
+border-left:150px solid transparent;
+border-right:150px solid transparent;
+border-bottom:100px solid #ccc;
+top:-100px;
+transition:transform 1s;
+transform-origin:bottom;
+}
+
+.envelope.open:before{
+transform:rotateX(180deg);
+}
+
+/* CARTA */
 
 .letter{
 background:white;
 color:black;
-padding:60px;
+padding:50px;
 width:60%;
-max-width:700px;
+max-width:650px;
 line-height:1.7;
-box-shadow:0 0 40px rgba(0,0,0,0.6);
 font-size:20px;
-}
-
-.title{
-font-size:45px;
-letter-spacing:4px;
-margin-bottom:20px;
-}
-
-.fadeText{
-animation:fadeIn 3s;
-}
-
-@keyframes fadeIn{
-from{opacity:0}
-to{opacity:1}
-}
-
-.shooting{
-position:absolute;
-top:20%;
-left:-200px;
-font-size:40px;
-animation:shoot 4s linear forwards;
-}
-
-@keyframes shoot{
-to{
-transform:translateX(120vw);
-}
-}
-
-.bigMessage{
-font-size:90px;
-letter-spacing:10px;
+box-shadow:0 0 40px rgba(0,0,0,.6);
 opacity:0;
-animation:appear 3s forwards;
+transform:translateY(40px);
+transition:all 2s;
 }
 
-@keyframes appear{
+.letter.show{
+opacity:1;
+transform:translateY(0);
+}
+
+/* MENSAJE FINAL */
+
+.big{
+font-size:90px;
+letter-spacing:8px;
+opacity:0;
+animation:fade 3s forwards;
+}
+
+@keyframes fade{
 to{opacity:1}
 }
 
@@ -138,44 +147,48 @@ to{opacity:1}
 <canvas id="stars"></canvas>
 
 <!-- ESCENA 1 -->
-<div class="scene active" id="scene1">
 
-<div class="title">Una carta para Emily</div>
+<div class="scene active" id="s1">
 
-<button onclick="nextScene()">Abrir</button>
+<div class="title">Una carta</div>
+
+<button onclick="next()">Abrir</button>
 
 </div>
 
 <!-- ESCENA 2 -->
-<div class="scene" id="scene2">
+
+<div class="scene" id="s2">
 
 <div class="title">¿Cuándo terminó todo?</div>
 
-<input id="respuesta" placeholder="Escribe aquí">
+<input id="resp" placeholder="Escribe aquí">
 
-<button onclick="checkAnswer()">Continuar</button>
+<button onclick="check()">Continuar</button>
 
-<p id="error"></p>
+<p id="err"></p>
 
 </div>
 
 <!-- ESCENA 3 -->
-<div class="scene" id="scene3">
 
-<div id="emilyStars" class="title">EMILY</div>
+<div class="scene" id="s3">
+
+<div class="title">Mira el cielo…</div>
 
 </div>
 
 <!-- ESCENA 4 -->
-<div class="scene" id="scene4">
+
+<div class="scene" id="s4">
 
 <div class="counterBox">
 
-<div style="font-size:22px;margin-bottom:10px;">
+<div style="font-size:20px;margin-bottom:10px">
 Desde aquel día que todo cambió
 </div>
 
-<div style="font-size:18px;">
+<div style="font-size:16px">
 DIAS : HORAS : MINUTOS
 </div>
 
@@ -185,27 +198,31 @@ DIAS : HORAS : MINUTOS
 
 </div>
 
-<!-- ESCENA 5 -->
-<div class="scene" id="scene5">
+<!-- ESCENA 5 SOBRE -->
 
-<div class="letter fadeText">
+<div class="scene" id="s5">
+
+<div class="envelope" onclick="openLetter()" id="env"></div>
+
+<div class="letter" id="letter">
 
 Emily…
 
-No sé exactamente en qué momento el silencio empezó a sentirse tan pesado.
+No sé en qué momento el silencio empezó a sentirse tan grande.
 
-Desde aquel día, hay cosas pequeñas que cambiaron sin que nadie las notara…  
-las noches se volvieron más largas,  
-las canciones sonaron distintas,  
+Desde aquel día hay cosas pequeñas que cambiaron sin que nadie lo note.  
+Las noches se volvieron más largas,  
+las canciones suenan distintas,  
 y tu nombre sigue apareciendo en mi mente cuando menos lo espero.
 
-No escribo esto para volver atrás el tiempo.  
-Solo porque hay cosas que el corazón no sabe guardar en silencio.
+No escribo esto para cambiar el pasado.
 
-A veces pienso que, aunque el mundo siga avanzando,  
-hay recuerdos que se quedan suspendidos en algún lugar del cielo.
+Solo porque hay recuerdos que el corazón no sabe guardar en silencio.
 
-Y entre todos esos recuerdos…  
+A veces pienso que aunque el mundo siga avanzando…  
+hay momentos que se quedan suspendidos en algún lugar del cielo.
+
+Y entre todos esos recuerdos  
 tu nombre sigue brillando.
 
 <br><br>
@@ -218,86 +235,82 @@ tu nombre sigue brillando.
 
 <!-- ESCENA FINAL -->
 
-<div class="scene" id="scene6">
+<div class="scene" id="s6">
 
-<div class="shooting">⭐</div>
-
-<div class="bigMessage">
-TE EXTRAÑO
-</div>
+<div class="big">TE EXTRAÑO</div>
 
 </div>
-
-
-<div class="arrow left" onclick="prevScene()">❮</div>
-<div class="arrow right" onclick="nextScene()">❯</div>
-
 
 <script>
 
-let current=0
+/* ESCENAS */
+
 let scenes=document.querySelectorAll(".scene")
+let i=0
 
-function showScene(i){
+function show(n){
 
-scenes[current].classList.remove("active")
-
-current=i
-
-if(current<0) current=0
-if(current>=scenes.length) current=scenes.length-1
-
-scenes[current].classList.add("active")
+scenes[i].classList.remove("active")
+i=n
+if(i<0)i=0
+if(i>=scenes.length)i=scenes.length-1
+scenes[i].classList.add("active")
 
 }
 
-function nextScene(){
-showScene(current+1)
+function next(){
+show(i+1)
 }
 
-function prevScene(){
-showScene(current-1)
-}
+/* RESPUESTA */
 
-/* respuesta */
+function check(){
 
-function checkAnswer(){
-
-let r=document.getElementById("respuesta").value.toLowerCase().trim()
+let r=document.getElementById("resp").value.toLowerCase()
 
 if(r.includes("3") && r.includes("marzo")){
-nextScene()
-setTimeout(nextScene,6000)
+next()
+setTimeout(next,6000)
 }else{
-document.getElementById("error").innerText="Intenta de nuevo"
+document.getElementById("err").innerText="Intenta de nuevo"
 }
 
 }
 
-/* contador */
+/* CONTADOR */
 
-let startDate=new Date("March 3, 2026 00:00:00")
+let start=new Date("March 3 2026 00:00:00")
 
-function updateCounter(){
+function update(){
 
 let now=new Date()
+let diff=now-start
 
-let diff=now-startDate
-
-let minutes=Math.floor(diff/60000)
-let hours=Math.floor(diff/3600000)
-let days=Math.floor(diff/86400000)
+let d=Math.floor(diff/86400000)
+let h=Math.floor(diff/3600000)%24
+let m=Math.floor(diff/60000)%60
 
 document.getElementById("counter").innerHTML=
-days+" : "+(hours%24)+" : "+(minutes%60)
+d+" : "+h+" : "+m
 
 }
 
-setInterval(updateCounter,60000)
+setInterval(update,60000)
+update()
 
-updateCounter()
+/* SOBRE */
 
-/* estrellas */
+function openLetter(){
+
+document.getElementById("env").classList.add("open")
+
+setTimeout(()=>{
+document.getElementById("letter").classList.add("show")
+},1200)
+
+}
+
+/* ESTRELLAS */
 
 const canvas=document.getElementById("stars")
 const ctx=canvas.getContext("2d")
@@ -307,31 +320,35 @@ canvas.height=window.innerHeight
 
 let stars=[]
 
-for(let i=0;i<200;i++){
+for(let i=0;i<250;i++){
+
 stars.push({
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
-size:Math.random()*2
+s:Math.random()*2
 })
+
 }
 
-function drawStars(){
+function draw(){
 
 ctx.clearRect(0,0,canvas.width,canvas.height)
 
 ctx.fillStyle="white"
 
-stars.forEach(s=>{
+stars.forEach(st=>{
+
 ctx.beginPath()
-ctx.arc(s.x,s.y,s.size,0,Math.PI*2)
+ctx.arc(st.x,st.y,st.s,0,Math.PI*2)
 ctx.fill()
+
 })
 
-requestAnimationFrame(drawStars)
+requestAnimationFrame(draw)
 
 }
 
-drawStars()
+draw()
 
 </script>
 
