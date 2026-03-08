@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html><html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Una carta</title>
-
-<style>
+<title>Un último recuerdo</title><style>
 
 body{
 margin:0;
@@ -14,8 +11,6 @@ color:white;
 font-family:Georgia,serif;
 overflow:hidden;
 }
-
-/* ESCENAS */
 
 .scene{
 position:absolute;
@@ -26,8 +21,8 @@ justify-content:center;
 align-items:center;
 flex-direction:column;
 opacity:0;
-pointer-events:none;
 transition:opacity 2s;
+pointer-events:none;
 }
 
 .scene.active{
@@ -35,14 +30,20 @@ opacity:1;
 pointer-events:auto;
 }
 
+.title{
+font-size:42px;
+letter-spacing:4px;
+text-align:center;
+}
+
 button{
+margin-top:20px;
 padding:12px 28px;
 font-size:18px;
 border:1px solid white;
 background:transparent;
 color:white;
 cursor:pointer;
-margin-top:20px;
 }
 
 button:hover{
@@ -54,50 +55,26 @@ canvas{
 position:absolute;
 top:0;
 left:0;
-transition:transform 6s ease;
 }
-
-.zoomSky{
-transform:scale(1.4);
-}
-
-.title{
-font-size:45px;
-letter-spacing:3px;
-text-align:center;
-}
-
-/* contador */
-
-.counterBox{
-background:white;
-color:red;
-padding:40px;
-border:4px solid black;
-font-size:40px;
-text-align:center;
-box-shadow:0 0 30px rgba(0,0,0,.6);
-}
-
-/* SOBRE */
 
 .envelope{
-width:300px;
-height:200px;
+width:260px;
+height:170px;
 background:#eee;
-position:relative;
-cursor:pointer;
+position:absolute;
+bottom:120px;
+display:none;
+opacity:0;
+transition:opacity 1.5s;
 }
 
 .envelope:before{
 content:"";
 position:absolute;
-width:0;
-height:0;
-border-left:150px solid transparent;
-border-right:150px solid transparent;
-border-bottom:100px solid #ccc;
-top:-100px;
+border-left:130px solid transparent;
+border-right:130px solid transparent;
+border-bottom:85px solid #ccc;
+top:-85px;
 transition:transform 1s;
 transform-origin:bottom;
 }
@@ -106,235 +83,62 @@ transform-origin:bottom;
 transform:rotateX(180deg);
 }
 
-/* CARTA */
-
 .letter{
 background:white;
 color:black;
-padding:50px;
-width:70%;
-max-width:700px;
-line-height:1.8;
+padding:40px;
+width:60%;
+max-width:600px;
 font-size:20px;
+line-height:1.6;
+display:none;
 box-shadow:0 0 40px rgba(0,0,0,.6);
-opacity:0;
-transform:translateY(40px);
-transition:all 2s;
-min-height:200px;
 }
 
-.letter.show{
-opacity:1;
-transform:translateY(0);
-}
-
-/* estrella fugaz */
-
-.shootingStar{
-position:absolute;
-top:45%;
-left:-200px;
-width:4px;
-height:4px;
-background:white;
-border-radius:50%;
-box-shadow:0 0 10px white,0 0 20px white;
-animation:shoot 3s linear forwards;
-}
-
-.shootingStar::after{
-content:"";
-position:absolute;
-width:120px;
-height:2px;
-background:linear-gradient(90deg,white,transparent);
-left:-120px;
-top:1px;
-}
-
-@keyframes shoot{
-to{
-transform:translateX(130vw) translateY(-150px);
-}
-}
-
-</style>
-</head>
-
-<body>
-
-<canvas id="stars"></canvas>
-
-<!-- escena 1 -->
+</style></head><body><canvas id="stars"></canvas>
 
 <div class="scene active" id="s1">
-<div class="title">Una carta</div>
+<div class="title">Un último recuerdo</div>
 <button onclick="next()">Abrir</button>
-</div>
-
-<!-- escena 2 -->
-
-<div class="scene" id="s2">
+</div><div class="scene" id="s2">
 <div class="title">¿Cuándo terminó todo?</div>
-<input id="resp" placeholder="Escribe aquí">
+<input id="resp">
 <button onclick="check()">Continuar</button>
 <p id="err"></p>
+</div><div class="scene" id="s3">
+<div class="title">Mira el cielo...</div>
+</div><div class="envelope" id="env"></div><div class="scene" id="s4">
+<div class="letter" id="letter">
+<p id="text"></p>
+<button onclick="closeLetter()">Cerrar carta</button>
 </div>
-
-<!-- cielo -->
-
-<div class="scene" id="s3">
-<div class="title">Mira el cielo…</div>
-</div>
-
-<!-- contador -->
-
-<div class="scene" id="s4">
-
-<div class="counterBox">
-
-<div style="font-size:20px;margin-bottom:10px">
-Desde aquel día que todo cambió
-</div>
-
-<div style="font-size:16px">
-DIAS : HORAS : MINUTOS
-</div>
-
-<div id="counter"></div>
-
-</div>
-
-</div>
-
-<!-- carta -->
-
-<div class="scene" id="s5">
-
-<div class="envelope" onclick="openLetter()" id="env"></div>
-
-<div class="letter" id="letter"></div>
-
-</div>
-
-<!-- final -->
-
-<div class="scene" id="s6"></div>
-
-<script>
+</div><script>
 
 /* ESCENAS */
 
-let scenes=document.querySelectorAll(".scene")
-let i=0
-
-function show(n){
-
-scenes[i].classList.remove("active")
-i=n
-if(i<0)i=0
-if(i>=scenes.length)i=scenes.length-1
-scenes[i].classList.add("active")
-
-if(n===2) cinematicSky()
-
-if(n===5) setTimeout(formTeExtrano,2000)
-
-}
+let current=1
 
 function next(){
-show(i+1)
-}
+document.getElementById("s"+current).classList.remove("active")
+current++
+document.getElementById("s"+current).classList.add("active")
 
-/* RESPUESTA */
+if(current==3){
+setTimeout(formEmily,2000)
+}
+}
 
 function check(){
+let r=document.getElementById("resp").value.toLowerCase()
 
-let r=document.getElementById("resp").value.toLowerCase().replace(/\s/g,"")
-
-if(r.includes("3marzo")||r.includes("3demarzo")||r.includes("3/3")||r.includes("03/03")){
+if(r.includes("febrero")||r.includes("14")){
 next()
 }else{
-document.getElementById("err").innerText="Intenta de nuevo"
+document.getElementById("err").innerText="Intenta recordar..."
+}
 }
 
-}
-
-/* CONTADOR */
-
-let start=new Date("March 3 2026 00:00:00")
-
-function update(){
-
-let now=new Date()
-let diff=now-start
-
-let d=Math.floor(diff/86400000)
-let h=Math.floor(diff/3600000)%24
-let m=Math.floor(diff/60000)%60
-
-document.getElementById("counter").innerHTML=
-d+" : "+h+" : "+m
-
-}
-
-setInterval(update,60000)
-update()
-
-/* SOBRE */
-
-function openLetter(){
-
-document.getElementById("env").classList.add("open")
-
-setTimeout(()=>{
-document.getElementById("letter").classList.add("show")
-typeLetter()
-},1200)
-
-}
-
-/* TEXTO MAQUINA */
-
-let text=`Emily…
-
-No sé en qué momento el silencio empezó a sentirse tan grande.
-
-Desde aquel día hay cosas pequeñas que cambiaron sin que nadie lo note.
-Las noches se volvieron más largas,
-las canciones suenan distintas,
-y tu nombre sigue apareciendo en mi mente cuando menos lo espero.
-
-No escribo esto para cambiar el pasado.
-
-Solo porque hay recuerdos que el corazón no sabe guardar en silencio.
-
-A veces pienso que aunque el mundo siga avanzando…
-hay momentos que se quedan suspendidos en algún lugar del cielo.
-
-Y entre todos esos recuerdos
-tu nombre sigue brillando.
-
-Mi corazón todavía recuerda tu nombre.`
-
-let pos=0
-
-function typeLetter(){
-
-let el=document.getElementById("letter")
-
-if(pos<text.length){
-
-el.innerHTML+=text.charAt(pos)
-pos++
-
-setTimeout(typeLetter,40)
-
-}
-
-}
-
-/* ESTRELLAS */
+/* CANVAS */
 
 const canvas=document.getElementById("stars")
 const ctx=canvas.getContext("2d")
@@ -343,129 +147,212 @@ canvas.width=window.innerWidth
 canvas.height=window.innerHeight
 
 let stars=[]
+let meteor=null
+let particles=[]
 
-for(let i=0;i<450;i++){
+for(let i=0;i<500;i++){
 
 stars.push({
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
-z:Math.random()*2,
-s:Math.random()*2
+size:Math.random()*1.5,
+alpha:Math.random(),
+tx:null,
+ty:null
 })
 
 }
 
-function draw(){
+/* MOTOR ANIMACION */
+
+function animate(){
 
 ctx.clearRect(0,0,canvas.width,canvas.height)
 
-ctx.fillStyle="white"
+/* estrellas */
 
-stars.forEach(st=>{
+for(let s of stars){
 
-st.y+=0.02*st.z
+if(s.tx){
+s.x+=(s.tx-s.x)*0.02
+s.y+=(s.ty-s.y)*0.02
+}
 
-if(st.y>canvas.height) st.y=0
+s.alpha+=(Math.random()-0.5)*0.03
+
+if(s.alpha<0.2)s.alpha=0.2
+if(s.alpha>1)s.alpha=1
 
 ctx.beginPath()
-ctx.arc(st.x,st.y,st.s*(0.5+Math.random()),0,Math.PI*2)
+ctx.fillStyle="rgba(255,255,255,"+s.alpha+")"
+ctx.arc(s.x,s.y,s.size,0,Math.PI*2)
 ctx.fill()
-
-})
-
-requestAnimationFrame(draw)
 
 }
 
-draw()
+/* meteorito */
 
-/* FORMAR TEXTO */
+if(meteor){
 
-function formText(pattern){
+meteor.x+=meteor.vx
+meteor.y+=meteor.vy
 
-stars.forEach((s,i)=>{
-
-let p=pattern[i%pattern.length]
-
-s.x=canvas.width/2 -200 + p[0]*25
-s.y=canvas.height/2 -60 + p[1]*25
-
+particles.push({
+x:meteor.x,
+y:meteor.y,
+life:30
 })
+
+ctx.beginPath()
+ctx.fillStyle="white"
+ctx.arc(meteor.x,meteor.y,4,0,Math.PI*2)
+ctx.fill()
+
+}
+
+/* particulas */
+
+for(let i=particles.length-1;i>=0;i--){
+
+let p=particles[i]
+
+p.life--
+
+ctx.beginPath()
+ctx.fillStyle="rgba(255,255,255,"+(p.life/30)+")"
+ctx.arc(p.x,p.y,2,0,Math.PI*2)
+ctx.fill()
+
+if(p.life<=0){
+particles.splice(i,1)
+}
+
+}
+
+requestAnimationFrame(animate)
+
+}
+
+animate()
+
+/* TEXTO ESTRELLAS */
+
+function starText(text,yOffset){
+
+ctx.fillStyle="white"
+ctx.font="120px Arial"
+ctx.textAlign="center"
+
+ctx.fillText(text,canvas.width/2,canvas.height/2+yOffset)
+
+let img=ctx.getImageData(0,0,canvas.width,canvas.height)
+
+let points=[]
+
+for(let y=0;y<img.height;y+=6){
+for(let x=0;x<img.width;x+=6){
+
+let i=(y*img.width+x)*4
+
+if(img.data[i+3]>128){
+points.push({x:x,y:y})
+}
+
+}
+}
+
+for(let i=0;i<points.length && i<stars.length;i++){
+stars[i].tx=points[i].x
+stars[i].ty=points[i].y
+stars[i].size=2
+}
 
 }
 
 /* EMILY */
 
 function formEmily(){
-
-let pattern=[
-[0,0],[1,0],[2,0],[0,1],[0,2],[1,2],[2,2],
-[4,0],[4,1],[4,2],
-[6,0],[6,1],[6,2],[7,1],
-[9,0],[9,1],[9,2],
-[11,0],[12,1],[13,2]
-]
-
-formText(pattern)
-
-}
-
-/* TE EXTRAÑO */
-
-function formTeExtrano(){
-
-let pattern=[
-[0,0],[1,0],[2,0],[1,1],[1,2],
-[4,0],[4,1],[4,2],
-[6,0],[7,0],[8,0],[7,1],[7,2]
-]
-
-formText(pattern)
-
-}
-
-/* DISPERSAR */
-
-function disperseStars(){
-
-stars.forEach(s=>{
-s.x=Math.random()*canvas.width
-s.y=Math.random()*canvas.height
-})
-
-}
-
-/* ESTRELLA FUGAZ */
-
-function shootingStar(){
-
-let star=document.createElement("div")
-star.className="shootingStar"
-
-document.body.appendChild(star)
+starText("EMILY",0)
 
 setTimeout(()=>{
-star.remove()
-next()
-},3000)
+meteor={x:0,y:100,vx:12,vy:4}
+},4000)
+
+setTimeout(openEnvelope,7000)
 
 }
 
-/* SECUENCIA CIELO */
+/* SOBRE */
 
-function cinematicSky(){
+function openEnvelope(){
 
-canvas.classList.add("zoomSky")
+let env=document.getElementById("env")
 
-setTimeout(formEmily,1000)
+env.style.display="block"
+env.style.left=(canvas.width-260)/2+"px"
 
-setTimeout(disperseStars,6000)
+setTimeout(()=>{
+env.style.opacity="1"
+},100)
 
-setTimeout(shootingStar,7500)
+setTimeout(()=>{
+env.classList.add("open")
+setTimeout(showLetter,1000)
+},1500)
 
 }
 
-</script>
+/* CARTA */
 
-</body>
+let message=`Emily...
+
+Tal vez esta carta llega tarde.
+
+Pero las estrellas todavía recuerdan tu nombre.
+
+Hay cosas que el tiempo no puede borrar.
+
+Cuando miro el cielo...
+
+todavía pienso en ti.
+
+Te extraño.`
+
+function showLetter(){
+
+document.getElementById("s3").classList.remove("active")
+document.getElementById("s4").classList.add("active")
+
+let letter=document.getElementById("letter")
+letter.style.display="block"
+
+typeWriter()
+
+}
+
+let i=0
+
+function typeWriter(){
+
+if(i<message.length){
+
+document.getElementById("text").innerHTML+=message.charAt(i)
+
+i++
+
+setTimeout(typeWriter,40)
+
+}
+
+}
+
+function closeLetter(){
+
+document.getElementById("s4").classList.remove("active")
+
+starText("TE EXTRAÑO",80)
+
+}
+
+</script></body>
 </html>
