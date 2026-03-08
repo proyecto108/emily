@@ -1,25 +1,467 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Acceso</title>
+<title>Emily</title>
 
 <style>
-body{
-background:black;
-color:#00ff00;
-font-family:monospace;
-text-align:center;
-margin-top:20%;
-}
-</style>
 
+/* MATRIX */
+
+#matrix{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+z-index:1;
+}
+
+/* INTRO */
+
+#intro{
+position:fixed;
+width:100%;
+height:100vh;
+background:transparent;
+color:#00ff9c;
+font-family:monospace;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+z-index:2;
+}
+
+.parpadeo{
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+0%{opacity:1}
+50%{opacity:0}
+100%{opacity:1}
+}
+
+input{
+padding:10px;
+border-radius:10px;
+border:none;
+text-align:center;
+margin-top:10px;
+}
+
+button{
+margin-top:10px;
+padding:10px 20px;
+border:none;
+border-radius:20px;
+background:#00ff9c;
+cursor:pointer;
+}
+
+/* PAGINA ORIGINAL */
+
+body{
+margin:0;
+height:100vh;
+background: radial-gradient(circle at top,#0f2027,#203a43,#2c5364);
+display:flex;
+justify-content:center;
+align-items:center;
+font-family:Georgia;
+color:white;
+text-align:center;
+overflow:hidden;
+}
+
+.estrellas{
+position:fixed;
+width:100%;
+height:100%;
+background:transparent;
+box-shadow:
+100px 200px white,
+300px 500px white,
+600px 100px white,
+800px 300px white,
+1200px 400px white,
+1500px 200px white;
+animation: mover 60s linear infinite;
+}
+
+@keyframes mover{
+from{transform:translateY(0)}
+to{transform:translateY(-1000px)}
+}
+
+.caja{
+background:rgba(0,0,0,0.55);
+padding:45px;
+border-radius:20px;
+max-width:600px;
+box-shadow:0 0 50px rgba(0,0,0,0.9);
+display:none;
+}
+
+h1{
+font-size:48px;
+cursor:pointer;
+text-shadow:0 0 10px #fff,0 0 20px #ff4d6d,0 0 40px #ff4d6d;
+animation:brillo 3s infinite alternate;
+}
+
+@keyframes brillo{
+from{opacity:0.8}
+to{opacity:1}
+}
+
+#contador{
+font-size:24px;
+color:#ff4d6d;
+margin:20px 0;
+}
+
+#frase{
+font-style:italic;
+opacity:0.8;
+margin-bottom:15px;
+}
+
+#texto{
+font-size:20px;
+line-height:1.6;
+min-height:120px;
+}
+
+#final{
+margin-top:30px;
+font-size:22px;
+opacity:0;
+transition:3s;
+}
+
+button.carta{
+margin-top:20px;
+padding:12px 25px;
+font-size:18px;
+border:none;
+border-radius:25px;
+background:#ff4d6d;
+color:white;
+cursor:pointer;
+}
+
+.corazon{
+position:fixed;
+color:#ff4d6d;
+font-size:20px;
+top:-10px;
+animation:caer 7s linear infinite;
+}
+
+@keyframes caer{
+0%{transform:translateY(-10px);}
+100%{transform:translateY(100vh);}
+}
+
+.estrella{
+position:fixed;
+color:white;
+font-size:18px;
+animation:estrella 4s linear;
+}
+
+@keyframes estrella{
+0%{transform:translate(-200px,-200px);}
+100%{transform:translate(120vw,120vh);}
+}
+
+#secreto{
+margin-top:20px;
+opacity:0;
+transition:2s;
+font-style:italic;
+}
+
+#recuerdo{
+position:fixed;
+bottom:40px;
+width:100%;
+text-align:center;
+opacity:0;
+transition:4s;
+font-style:italic;
+}
+
+</style>
 </head>
 
 <body>
 
-<h1>ACCESO DETECTADO</h1>
-<p>Conectando al sistema...</p>
-<p>Esperando autorización...</p>
+<canvas id="matrix"></canvas>
+
+<div id="intro">
+
+<div id="cargando" class="parpadeo">
+Cargando mensaje...
+</div>
+
+<div id="pregunta" style="display:none;">
+
+<p>Si realmente recuerdas…</p>
+
+<p>¿Cuál fue el primer mensaje del 2026 que te envié?</p>
+
+<input id="respuesta">
+
+<br>
+
+<button onclick="verificar()">Responder</button>
+
+</div>
+
+<div id="encontrado" style="display:none;">
+Mensaje encontrado...
+</div>
+
+</div>
+
+<div class="estrellas"></div>
+
+<div class="caja" id="pagina">
+
+<h1 onclick="secreto()">Emily</h1>
+
+<p>Tiempo desde el 3 de marzo de 2026</p>
+
+<div id="contador"></div>
+
+<div id="frase"></div>
+
+<div id="texto"></div>
+
+<button class="carta" onclick="iniciar()">Si estás viendo esto…</button>
+
+<div id="final">
+Nunca voy a arrepentirme de haberte conocido.<br><br>
+Porque algunas personas llegan a tu vida<br>
+y dejan algo que el tiempo no puede borrar.<br><br>
+Si algún día vuelves a esta página…<br>
+el contador seguirá avanzando.
+</div>
+
+<div id="secreto">
+Sabía que intentarías descubrir si había algo más.
+</div>
+
+</div>
+
+<div id="recuerdo">
+A veces uno se da cuenta de lo que tenía… cuando ya se fue.
+</div>
+
+<script>
+
+/* MATRIX */
+
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
+
+canvas.height=window.innerHeight;
+canvas.width=window.innerWidth;
+
+let letras="01";
+letras=letras.split("");
+
+let fontSize=16;
+let columnas=canvas.width/fontSize;
+
+let gotas=[];
+
+for(let x=0;x<columnas;x++){
+gotas[x]=1;
+}
+
+function dibujar(){
+
+ctx.fillStyle="rgba(0,0,0,0.05)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle="#00ff9c";
+ctx.font=fontSize+"px monospace";
+
+for(let i=0;i<gotas.length;i++){
+
+let texto=letras[Math.floor(Math.random()*letras.length)];
+
+ctx.fillText(texto,i*fontSize,gotas[i]*fontSize);
+
+if(gotas[i]*fontSize>canvas.height && Math.random()>0.975){
+gotas[i]=0;
+}
+
+gotas[i]++;
+
+}
+
+}
+
+setInterval(dibujar,33);
+
+/* INTRO */
+
+setTimeout(()=>{
+document.getElementById("cargando").style.display="none";
+document.getElementById("pregunta").style.display="block";
+},4000);
+
+function verificar(){
+
+let r=document.getElementById("respuesta").value.toLowerCase();
+
+if(r=="te amo"){
+
+document.getElementById("pregunta").style.display="none";
+document.getElementById("encontrado").style.display="block";
+
+setTimeout(()=>{
+document.getElementById("intro").style.display="none";
+document.getElementById("pagina").style.display="block";
+},3000);
+
+}else{
+
+alert("Intenta recordar mejor...");
+
+}
+
+}
+
+/* contador */
+
+let fecha=new Date("2026-03-03 00:00:00");
+
+function contador(){
+
+let ahora=new Date();
+let d=ahora-fecha;
+
+let dias=Math.floor(d/(1000*60*60*24));
+let horas=Math.floor((d/(1000*60*60))%24);
+let minutos=Math.floor((d/(1000*60))%60);
+let segundos=Math.floor((d/1000)%60);
+
+document.getElementById("contador").innerHTML=
+dias+" días "+
+horas+" horas "+
+minutos+" minutos "+
+segundos+" segundos";
+
+}
+
+setInterval(contador,1000);
+
+/* frases */
+
+let frases=[
+"El tiempo sigue avanzando…",
+"Pero algunos recuerdos no.",
+"Hay personas que dejan huellas.",
+"Algunas historias nunca se olvidan."
+];
+
+let f=0;
+
+setInterval(()=>{
+document.getElementById("frase").innerHTML=frases[f];
+f=(f+1)%frases.length;
+},4000);
+
+/* carta */
+
+let mensaje="Desde el 3 de marzo el tiempo siguió avanzando. Los días pasaron… las horas también. Pero hay recuerdos que el tiempo simplemente no borra.";
+
+let i=0;
+
+function iniciar(){
+document.querySelector(".carta").style.display="none";
+escribir();
+}
+
+function escribir(){
+
+if(i<mensaje.length){
+document.getElementById("texto").innerHTML+=mensaje.charAt(i);
+i++;
+setTimeout(escribir,45);
+}else{
+setTimeout(()=>{
+document.getElementById("final").style.opacity="1";
+},2000);
+}
+
+}
+
+/* corazones */
+
+function corazones(){
+
+let c=document.createElement("div");
+c.classList.add("corazon");
+c.innerHTML="❤";
+c.style.left=Math.random()*100+"vw";
+
+document.body.appendChild(c);
+
+setTimeout(()=>{
+c.remove();
+},7000);
+
+}
+
+setInterval(corazones,500);
+
+/* estrellas */
+
+function estrella(){
+
+let e=document.createElement("div");
+e.classList.add("estrella");
+e.innerHTML="✦";
+
+document.body.appendChild(e);
+
+setTimeout(()=>{
+e.remove();
+},4000);
+
+}
+
+setInterval(estrella,8000);
+
+/* secreto */
+
+let clicks=0;
+
+function secreto(){
+
+clicks++;
+
+if(clicks==5){
+document.getElementById("secreto").style.opacity="1";
+}
+
+}
+
+/* recuerdo */
+
+setTimeout(()=>{
+document.getElementById("recuerdo").style.opacity="1";
+},45000);
+
+</script>
 
 </body>
 </html>
