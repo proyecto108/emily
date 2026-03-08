@@ -5,55 +5,67 @@
 <title>Emily</title>
 
 <style>
-
 body{
 margin:0;
 background:black;
 color:white;
-font-family:Arial;
+font-family:Arial, sans-serif;
 text-align:center;
 overflow:hidden;
 }
 
-#cielo{
+/* cielo y estrellas */
+
+#sky{
 position:fixed;
 top:0;
 left:0;
 width:100%;
 height:100%;
-background:black;
 z-index:-1;
 }
 
-.estrella{
+.star{
 position:absolute;
-background:white;
 width:2px;
 height:2px;
-animation:brillar 2s infinite alternate;
+background:white;
+opacity:0.8;
+animation:twinkle 2s infinite alternate;
 }
 
-@keyframes brillar{
+@keyframes twinkle{
 from{opacity:0.2;}
 to{opacity:1;}
 }
 
-#emily{
-font-size:50px;
-color:#ff4d6d;
-text-shadow:0 0 10px #ff4d6d,0 0 20px #ff4d6d,0 0 40px #ff4d6d;
-margin-top:80px;
-animation:glow 2s infinite alternate;
+/* intro */
+
+#intro{
+position:absolute;
+top:40%;
+width:100%;
+font-size:32px;
+opacity:0;
+animation:fadeIn 2s forwards;
 }
 
-@keyframes glow{
-from{transform:scale(1);}
-to{transform:scale(1.05);}
+@keyframes fadeIn{
+to{opacity:1;}
 }
 
-#pregunta,#mensaje,#carta{
+/* loader */
+
+#loader{
+margin-top:120px;
+font-size:20px;
+}
+
+/* secciones */
+
+#question,#memory,#skyScene{
 display:none;
-margin-top:40px;
+margin-top:80px;
 }
 
 input{
@@ -62,154 +74,323 @@ font-size:18px;
 }
 
 button{
-padding:10px;
+padding:10px 20px;
 font-size:18px;
 cursor:pointer;
 }
 
-#carta{
-max-width:600px;
-margin:auto;
+/* emily estrellas */
+
+#emilyStars{
+font-size:55px;
+letter-spacing:15px;
+color:#fff;
+text-shadow:0 0 10px #fff,0 0 30px #ff8fab;
+margin-top:40px;
+transition:opacity 4s;
+}
+
+/* estrella fugaz */
+
+.shootingStar{
+position:fixed;
+width:2px;
+height:80px;
+background:linear-gradient(white,transparent);
+transform:rotate(45deg);
+animation:shoot 1s linear;
+}
+
+@keyframes shoot{
+0%{transform:translate(-200px,-200px) rotate(45deg);opacity:1;}
+100%{transform:translate(800px,800px) rotate(45deg);opacity:0;}
+}
+
+/* mensaje te extraño */
+
+#missMessage{
+position:fixed;
+top:30%;
+width:100%;
+font-size:40px;
+color:white;
+text-shadow:0 0 10px white,0 0 30px #ff8fab;
+opacity:0;
+transition:opacity 0.6s;
+pointer-events:none;
+}
+
+/* frases */
+
+#phrases{
+margin-top:20px;
+font-size:18px;
+opacity:0.8;
+}
+
+/* contador */
+
+#counter{
+margin-top:20px;
+font-size:18px;
+}
+
+/* carta */
+
+#letter{
+margin-top:40px;
+max-width:650px;
+margin-left:auto;
+margin-right:auto;
 font-size:20px;
 line-height:1.6;
 min-height:200px;
 }
 
-.corazon{
-position:fixed;
-color:red;
-font-size:20px;
-animation:subir 6s linear infinite;
-}
+/* final */
 
-@keyframes subir{
-0%{transform:translateY(100vh);}
-100%{transform:translateY(-10vh);}
+#final{
+margin-top:40px;
+font-size:18px;
+opacity:0.8;
 }
-
 </style>
-
 </head>
 
 <body>
 
-<div id="cielo"></div>
+<div id="sky"></div>
 
-<h1 id="emily">Emily ✨</h1>
+<div id="missMessage">te extraño</div>
 
-<h2 id="cargando">Cargando mensaje...</h2>
+<div id="intro">Emily</div>
 
-<div id="pregunta">
-
-<h3>¿Cuál fue el primer mensaje del 2026 que me enviaste?</h3>
-
-<input id="respuesta">
-<button onclick="verificar()">Enviar</button>
-
+<div id="loader">
+<p>Cargando memoria...</p>
+<p>Buscando conversación...</p>
+<p>Accediendo a recuerdos...</p>
 </div>
 
-<div id="mensaje">
-<h3>Mensaje encontrado...</h3>
+<div id="question">
+<p>¿Cuál fue el primer mensaje del 2026 que me enviaste?</p>
+<input id="answer">
+<button onclick="checkAnswer()">Responder</button>
 </div>
 
-<div id="carta"></div>
+<div id="memory">
+<p>Mensaje encontrado...</p>
+<p>Abriendo recuerdo...</p>
+</div>
+
+<div id="skyScene">
+
+<div id="emilyStars">E M I L Y</div>
+
+<div id="phrases"></div>
+
+<div id="counter"></div>
+
+<div id="letter"></div>
+
+<div id="final"></div>
+
+</div>
 
 <script>
 
-for(let i=0;i<120;i++){
-let estrella=document.createElement("div");
-estrella.className="estrella";
-estrella.style.left=Math.random()*100+"vw";
-estrella.style.top=Math.random()*100+"vh";
-document.getElementById("cielo").appendChild(estrella);
+/* estrellas del cielo */
+
+for(let i=0;i<150;i++){
+let star=document.createElement("div");
+star.className="star";
+star.style.left=Math.random()*100+"vw";
+star.style.top=Math.random()*100+"vh";
+document.getElementById("sky").appendChild(star);
 }
 
-setTimeout(()=>{
-document.getElementById("cargando").style.display="none";
-document.getElementById("pregunta").style.display="block";
-},3000);
-
-function verificar(){
-
-let r=document.getElementById("respuesta").value.toLowerCase();
-
-if(r==="te amo"){
-
-document.getElementById("pregunta").style.display="none";
-document.getElementById("mensaje").style.display="block";
+/* inicio */
 
 setTimeout(()=>{
+document.getElementById("loader").style.display="none";
+document.getElementById("question").style.display="block";
+},4000);
 
-document.getElementById("mensaje").style.display="none";
-document.getElementById("carta").style.display="block";
+/* respuesta flexible */
 
-escribirCarta();
-corazones();
+function checkAnswer(){
 
+let a=document.getElementById("answer").value
+.toLowerCase()
+.replace(/\s/g,"");
+
+if(a==="teamo"){
+
+document.getElementById("question").style.display="none";
+document.getElementById("memory").style.display="block";
+
+setTimeout(()=>{
+document.getElementById("memory").style.display="none";
+document.getElementById("skyScene").style.display="block";
+startExperience();
 },3000);
 
 }else{
 
-alert("Respuesta incorrecta");
+alert("Ese no fue el recuerdo...");
 
 }
 
 }
 
-function escribirCarta(){
+/* frases */
 
-let texto=`Para ti Emily ❤️
+let phrases=[
+"Aún miro el cielo pensando en ti",
+"Hay noches donde tu nombre brilla más que las estrellas",
+"Emily...",
+"Hay recuerdos que no se apagan"
+];
 
-Desde que llegaste a mi vida algo cambió.
-Tal vez empezó con un simple mensaje,
-pero para mí significó mucho más.
+let phraseIndex=0;
 
-Hay personas que aparecen por casualidad,
-pero tú llegaste para hacer todo diferente.
+function changePhrase(){
+document.getElementById("phrases").innerText=phrases[phraseIndex];
+phraseIndex=(phraseIndex+1)%phrases.length;
+}
 
-Los momentos simples contigo
-se vuelven especiales.
+setInterval(changePhrase,6000);
 
-No sé exactamente qué traerá el futuro,
-pero sí sé algo con seguridad:
+/* contador */
 
-Me gusta que seas parte de mi vida.
+function updateCounter(){
 
-Te amo.`;
+let start=new Date("March 3, 2026 00:00:00").getTime();
+let now=new Date().getTime();
+let diff=now-start;
+
+let days=Math.floor(diff/(1000*60*60*24));
+let hours=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+let minutes=Math.floor((diff%(1000*60*60))/(1000*60));
+
+document.getElementById("counter").innerHTML=
+"Han pasado<br>"+days+" días<br>"+hours+" horas<br>"+minutes+" minutos<br>desde el 3 de marzo de 2026";
+
+}
+
+setInterval(updateCounter,60000);
+updateCounter();
+
+/* carta */
+
+function typeLetter(){
+
+let text=`Emily...
+
+No sé si algún día llegarás a ver esto.
+
+Pero había algo que necesitaba decir,
+aunque sea al cielo.
+
+A veces miro nuestras conversaciones
+y vuelvo a ese primer mensaje del 2026.
+
+Ese "Te amo" que te envié...
+
+y me pregunto en qué momento
+dejamos de ser nosotros.
+
+Tal vez nunca leas esto...
+
+...pero necesitaba decirlo.
+
+Porque aunque el tiempo pase
+y todo cambie,
+
+todavía hay una parte de ti
+que sigue viviendo aquí,
+
+en mi corazón.`;
 
 let i=0;
 
-let intervalo=setInterval(()=>{
+let interval=setInterval(()=>{
 
-document.getElementById("carta").innerHTML+=texto[i];
-
+document.getElementById("letter").innerHTML+=text[i];
 i++;
 
-if(i>=texto.length){
-clearInterval(intervalo);
+if(i>=text.length){
+clearInterval(interval);
+showFinal();
+fadeEmily();
 }
 
 },40);
 
 }
 
-function corazones(){
+/* final */
 
-setInterval(()=>{
+function showFinal(){
 
-let c=document.createElement("div");
+setTimeout(()=>{
 
-c.className="corazon";
+document.getElementById("final").innerHTML=
+"A veces todavía reviso nuestro chat...<br><br>solo para volver a ver ese \"Te amo\" que te envié el primer día del 2026.<br><br>Si algún día vuelves a esta página...<br>quiero que sepas que todavía guardo tu lugar en mi corazón.";
 
-c.innerHTML="❤️";
+},4000);
 
-c.style.left=Math.random()*100+"vw";
+}
 
-document.body.appendChild(c);
+/* Emily se desvanece */
 
-setTimeout(()=>{c.remove();},6000);
+function fadeEmily(){
+setTimeout(()=>{
+document.getElementById("emilyStars").style.opacity="0.3";
+},8000);
+}
 
-},400);
+/* estrella fugaz + mensaje */
+
+let firstStar=true;
+
+function shootingStar(){
+
+let star=document.createElement("div");
+star.className="shootingStar";
+
+star.style.top=Math.random()*50+"vh";
+star.style.left=Math.random()*50+"vw";
+
+document.body.appendChild(star);
+
+if(firstStar){
+firstStar=false;
+
+let msg=document.getElementById("missMessage");
+
+msg.style.opacity="1";
+
+setTimeout(()=>{
+msg.style.opacity="0";
+},1500);
+
+}
+
+setTimeout(()=>{
+star.remove();
+},1000);
+
+}
+
+setInterval(shootingStar,8000);
+
+/* iniciar experiencia */
+
+function startExperience(){
+
+changePhrase();
+
+setTimeout(typeLetter,5000);
 
 }
 
