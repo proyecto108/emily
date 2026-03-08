@@ -12,6 +12,12 @@ font-family:Georgia,serif;
 overflow:hidden;
 }
 
+canvas{
+position:absolute;
+top:0;
+left:0;
+}
+
 .scene{
 position:absolute;
 width:100%;
@@ -51,70 +57,50 @@ background:white;
 color:black;
 }
 
-canvas{
-position:absolute;
-top:0;
-left:0;
-}
-
-.envelope{
-width:260px;
-height:170px;
-background:#eee;
-position:absolute;
-bottom:120px;
-display:none;
-opacity:0;
-transition:opacity 1.5s;
-}
-
-.envelope:before{
-content:"";
-position:absolute;
-border-left:130px solid transparent;
-border-right:130px solid transparent;
-border-bottom:85px solid #ccc;
-top:-85px;
-transition:transform 1s;
-transform-origin:bottom;
-}
-
-.envelope.open:before{
-transform:rotateX(180deg);
+input{
+padding:10px;
+font-size:16px;
 }
 
 .letter{
 background:white;
 color:black;
 padding:40px;
-width:60%;
-max-width:600px;
+width:70%;
+max-width:700px;
 font-size:20px;
-line-height:1.6;
-display:none;
+line-height:1.7;
 box-shadow:0 0 40px rgba(0,0,0,.6);
+display:none;
+}
+
+#contador{
+margin-top:20px;
+font-size:16px;
+opacity:.7;
 }
 
 </style></head><body><canvas id="stars"></canvas>
 
-<div class="scene active" id="s1">
+<audio id="shootSound" preload="auto">
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5d6f13c6c4.mp3?filename=whoosh-6316.mp3" type="audio/mpeg">
+</audio><div class="scene active" id="s1">
 <div class="title">Un último recuerdo</div>
 <button onclick="next()">Abrir</button>
 </div><div class="scene" id="s2">
 <div class="title">¿Cuándo terminó todo?</div>
-<input id="resp">
+<input id="resp" placeholder="Escribe la fecha">
 <button onclick="check()">Continuar</button>
 <p id="err"></p>
 </div><div class="scene" id="s3">
 <div class="title">Mira el cielo...</div>
-</div><div class="envelope" id="env"></div><div class="scene" id="s4">
+</div><div class="scene" id="s4">
 <div class="letter" id="letter">
 <p id="text"></p>
-<button onclick="closeLetter()">Cerrar carta</button>
+<p id="contador"></p>
+<button onclick="closeLetter()">Cerrar</button>
 </div>
 </div><script>
-
-/* ESCENAS */
 
 let current=1
 
@@ -129,13 +115,15 @@ setTimeout(formEmily,2000)
 }
 
 function check(){
+
 let r=document.getElementById("resp").value.toLowerCase()
 
-if(r.includes("febrero")||r.includes("14")){
+if(r.includes("3") && r.includes("marzo")){
 next()
 }else{
 document.getElementById("err").innerText="Intenta recordar..."
 }
+
 }
 
 /* CANVAS */
@@ -148,7 +136,7 @@ canvas.height=window.innerHeight
 
 let stars=[]
 let meteor=null
-let particles=[]
+let heartTimer=0
 
 for(let i=0;i<500;i++){
 
@@ -163,13 +151,11 @@ ty:null
 
 }
 
-/* MOTOR ANIMACION */
+/* ANIMACION */
 
 function animate(){
 
 ctx.clearRect(0,0,canvas.width,canvas.height)
-
-/* estrellas */
 
 for(let s of stars){
 
@@ -197,12 +183,6 @@ if(meteor){
 meteor.x+=meteor.vx
 meteor.y+=meteor.vy
 
-particles.push({
-x:meteor.x,
-y:meteor.y,
-life:30
-})
-
 ctx.beginPath()
 ctx.fillStyle="white"
 ctx.arc(meteor.x,meteor.y,4,0,Math.PI*2)
@@ -210,22 +190,13 @@ ctx.fill()
 
 }
 
-/* particulas */
+/* corazón */
 
-for(let i=particles.length-1;i>=0;i--){
+if(heartTimer>0){
 
-let p=particles[i]
+drawHeart()
 
-p.life--
-
-ctx.beginPath()
-ctx.fillStyle="rgba(255,255,255,"+(p.life/30)+")"
-ctx.arc(p.x,p.y,2,0,Math.PI*2)
-ctx.fill()
-
-if(p.life<=0){
-particles.splice(i,1)
-}
+heartTimer--
 
 }
 
@@ -237,13 +208,13 @@ animate()
 
 /* TEXTO ESTRELLAS */
 
-function starText(text,yOffset){
+function starText(text){
 
 ctx.fillStyle="white"
 ctx.font="120px Arial"
 ctx.textAlign="center"
 
-ctx.fillText(text,canvas.width/2,canvas.height/2+yOffset)
+ctx.fillText(text,canvas.width/2,canvas.height/2)
 
 let img=ctx.getImageData(0,0,canvas.width,canvas.height)
 
@@ -262,9 +233,11 @@ points.push({x:x,y:y})
 }
 
 for(let i=0;i<points.length && i<stars.length;i++){
+
 stars[i].tx=points[i].x
 stars[i].ty=points[i].y
 stars[i].size=2
+
 }
 
 }
@@ -272,33 +245,18 @@ stars[i].size=2
 /* EMILY */
 
 function formEmily(){
-starText("EMILY",0)
+
+starText("EMILY")
 
 setTimeout(()=>{
+
 meteor={x:0,y:100,vx:12,vy:4}
+
+document.getElementById("shootSound").play()
+
 },4000)
 
-setTimeout(openEnvelope,7000)
-
-}
-
-/* SOBRE */
-
-function openEnvelope(){
-
-let env=document.getElementById("env")
-
-env.style.display="block"
-env.style.left=(canvas.width-260)/2+"px"
-
-setTimeout(()=>{
-env.style.opacity="1"
-},100)
-
-setTimeout(()=>{
-env.classList.add("open")
-setTimeout(showLetter,1000)
-},1500)
+setTimeout(showLetter,7000)
 
 }
 
@@ -308,15 +266,27 @@ let message=`Emily...
 
 Tal vez esta carta llega tarde.
 
-Pero las estrellas todavía recuerdan tu nombre.
+Pero hay recuerdos que el tiempo no consigue borrar.
 
-Hay cosas que el tiempo no puede borrar.
+Desde aquel 3 de marzo
+hay lugares que prefiero evitar,
+no porque no me gusten,
+sino porque cada rincón guarda un momento contigo.
 
-Cuando miro el cielo...
+También hay canciones que ya no escucho.
 
-todavía pienso en ti.
+Porque sé que si vuelven a sonar
+los recuerdos llegan demasiado fuerte.
 
-Te extraño.`
+A veces miro el cielo por la noche
+y me pregunto en qué momento
+todo cambió tanto.
+
+No escribo esto esperando algo.
+
+Solo quería que supieras
+que hay cosas que siguen viviendo en silencio
+dentro de mí.`
 
 function showLetter(){
 
@@ -327,6 +297,7 @@ let letter=document.getElementById("letter")
 letter.style.display="block"
 
 typeWriter()
+startCounter()
 
 }
 
@@ -340,17 +311,64 @@ document.getElementById("text").innerHTML+=message.charAt(i)
 
 i++
 
-setTimeout(typeWriter,40)
+setTimeout(typeWriter,35)
 
 }
 
 }
+
+/* CONTADOR */
+
+function startCounter(){
+
+let start=new Date("March 3, 2026")
+
+setInterval(()=>{
+
+let now=new Date()
+
+let diff=now-start
+
+let days=Math.floor(diff/(1000*60*60*24))
+
+document.getElementById("contador").innerText=
+"Han pasado "+days+" días desde el 3 de marzo."
+
+},1000)
+
+}
+
+/* CORAZON */
+
+function drawHeart(){
+
+let x=canvas.width/2
+let y=canvas.height/2-100
+
+ctx.fillStyle="rgba(255,150,150,0.8)"
+
+for(let t=0;t<Math.PI*2;t+=0.2){
+
+let hx=16*Math.pow(Math.sin(t),3)
+let hy=13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t)
+
+ctx.beginPath()
+ctx.arc(x+hx*10,y-hy*10,2,0,Math.PI*2)
+ctx.fill()
+
+}
+
+}
+
+canvas.addEventListener("click",()=>{
+
+heartTimer=60
+
+})
 
 function closeLetter(){
 
 document.getElementById("s4").classList.remove("active")
-
-starText("TE EXTRAÑO",80)
 
 }
 
