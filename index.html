@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>Emily</title>
+
 <style>
+
 body{
+margin:0;
 background:black;
-color:#00ff00;
-font-family:monospace;
+color:white;
+font-family:Arial;
 text-align:center;
-margin-top:100px;
+overflow:hidden;
 }
 
-#matrix{
+#cielo{
 position:fixed;
 top:0;
 left:0;
@@ -21,77 +25,113 @@ background:black;
 z-index:-1;
 }
 
+.estrella{
+position:absolute;
+background:white;
+width:2px;
+height:2px;
+animation:brillar 2s infinite alternate;
+}
+
+@keyframes brillar{
+from{opacity:0.2;}
+to{opacity:1;}
+}
+
+#emily{
+font-size:50px;
+color:#ff4d6d;
+text-shadow:0 0 10px #ff4d6d,0 0 20px #ff4d6d,0 0 40px #ff4d6d;
+margin-top:80px;
+animation:glow 2s infinite alternate;
+}
+
+@keyframes glow{
+from{transform:scale(1);}
+to{transform:scale(1.05);}
+}
+
+#pregunta,#mensaje,#carta{
+display:none;
+margin-top:40px;
+}
+
 input{
 padding:10px;
 font-size:18px;
-background:black;
-color:#00ff00;
-border:1px solid #00ff00;
 }
 
 button{
 padding:10px;
 font-size:18px;
-background:black;
-color:#00ff00;
-border:1px solid #00ff00;
 cursor:pointer;
 }
 
 #carta{
-display:none;
-color:white;
 max-width:600px;
 margin:auto;
-margin-top:50px;
 font-size:20px;
+line-height:1.6;
+min-height:200px;
 }
+
+.corazon{
+position:fixed;
+color:red;
+font-size:20px;
+animation:subir 6s linear infinite;
+}
+
+@keyframes subir{
+0%{transform:translateY(100vh);}
+100%{transform:translateY(-10vh);}
+}
+
 </style>
+
 </head>
 
 <body>
 
-<h1 id="titulo">Cargando mensaje...</h1>
+<div id="cielo"></div>
 
-<div id="pregunta" style="display:none;">
-<h2>¿Cuál fue el primer mensaje del 2026 que me enviaste?</h2>
-<input id="respuesta" placeholder="Escribe aquí">
+<h1 id="emily">Emily ✨</h1>
+
+<h2 id="cargando">Cargando mensaje...</h2>
+
+<div id="pregunta">
+
+<h3>¿Cuál fue el primer mensaje del 2026 que me enviaste?</h3>
+
+<input id="respuesta">
 <button onclick="verificar()">Enviar</button>
+
 </div>
 
-<div id="mensaje" style="display:none;">
-<h2>Mensaje encontrado...</h2>
+<div id="mensaje">
+<h3>Mensaje encontrado...</h3>
 </div>
 
-<div id="carta">
-<h2>Para ti Emily ❤️</h2>
-<p>
-Quería decirte algo que quizá no siempre sé expresar bien.  
-Desde que llegaste a mi vida todo se siente diferente.  
-Hay momentos simples que contigo se vuelven especiales.  
-No sé exactamente qué traerá el futuro, pero sí sé que  
-me gusta caminarlo contigo.
-</p>
-
-<p>
-Si alguna vez dudas de lo que siento, recuerda esto:  
-todo empezó con un simple mensaje…  
-pero para mí significó mucho más.
-</p>
-
-<p>Te amo.</p>
-</div>
+<div id="carta"></div>
 
 <script>
 
+for(let i=0;i<120;i++){
+let estrella=document.createElement("div");
+estrella.className="estrella";
+estrella.style.left=Math.random()*100+"vw";
+estrella.style.top=Math.random()*100+"vh";
+document.getElementById("cielo").appendChild(estrella);
+}
+
 setTimeout(()=>{
-document.getElementById("titulo").style.display="none";
+document.getElementById("cargando").style.display="none";
 document.getElementById("pregunta").style.display="block";
 },3000);
 
 function verificar(){
 
-let r = document.getElementById("respuesta").value.toLowerCase();
+let r=document.getElementById("respuesta").value.toLowerCase();
 
 if(r==="te amo"){
 
@@ -99,13 +139,77 @@ document.getElementById("pregunta").style.display="none";
 document.getElementById("mensaje").style.display="block";
 
 setTimeout(()=>{
+
 document.getElementById("mensaje").style.display="none";
 document.getElementById("carta").style.display="block";
+
+escribirCarta();
+corazones();
+
 },3000);
 
 }else{
+
 alert("Respuesta incorrecta");
+
 }
+
+}
+
+function escribirCarta(){
+
+let texto=`Para ti Emily ❤️
+
+Desde que llegaste a mi vida algo cambió.
+Tal vez empezó con un simple mensaje,
+pero para mí significó mucho más.
+
+Hay personas que aparecen por casualidad,
+pero tú llegaste para hacer todo diferente.
+
+Los momentos simples contigo
+se vuelven especiales.
+
+No sé exactamente qué traerá el futuro,
+pero sí sé algo con seguridad:
+
+Me gusta que seas parte de mi vida.
+
+Te amo.`;
+
+let i=0;
+
+let intervalo=setInterval(()=>{
+
+document.getElementById("carta").innerHTML+=texto[i];
+
+i++;
+
+if(i>=texto.length){
+clearInterval(intervalo);
+}
+
+},40);
+
+}
+
+function corazones(){
+
+setInterval(()=>{
+
+let c=document.createElement("div");
+
+c.className="corazon";
+
+c.innerHTML="❤️";
+
+c.style.left=Math.random()*100+"vw";
+
+document.body.appendChild(c);
+
+setTimeout(()=>{c.remove();},6000);
+
+},400);
 
 }
 
